@@ -2,8 +2,8 @@ import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const getAdminsFromDB = async (params: any) => {
-  const {searchTerm, ...filteredData} = await params
-  console.log({ filteredData });
+  const { searchTerm, ...filteredData } = await params;
+  // console.log({ filteredData });
   const andConditions: Prisma.AdminWhereInput[] = [];
   if (params.searchTerm) {
     andConditions.push({
@@ -17,14 +17,14 @@ const getAdminsFromDB = async (params: any) => {
   }
 
   // specific fields er upor filtering
-  if (Object.keys(filteredData).length>0) {
+  if (Object.keys(filteredData).length > 0) {
     andConditions.push({
-      AND: Object.keys(filteredData).map(key=>({
-        [key]: {
-          equals: filteredData[key]
-        }
-      }))
-    })
+      AND: Object.keys(filteredData).map((key) => ({
+        [key.trim()]: {
+          equals: filteredData[key],
+        },
+      })),
+    });
   }
   //
   // [
