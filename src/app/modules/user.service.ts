@@ -24,7 +24,6 @@ const createAdmin = async (data: any) => {
     const createdAdminData = await tx.admin.create({
       data: data.admin,
     });
-
     return createdAdminData;
   });
   // const adminData ={
