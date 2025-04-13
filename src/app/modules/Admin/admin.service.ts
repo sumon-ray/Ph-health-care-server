@@ -1,9 +1,10 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import calculatePagination from "../../../helpers/paginationHelper";
 import { adminSearchableField } from "./admin.constant";
+import prisma from "../../../shared/prisma";
 
-const prisma = new PrismaClient();
-const getAdminsFromDB = async (params: any, options:any) => {
-  const {page, limit } = options
+const getAdminsFromDB = async (params: any, options: any) => {
+  const { page, limit, skip } = calculatePagination(options);
   // console.log(options)
   const { searchTerm, ...filteredData } = await params;
   // console.log({ filteredData });
@@ -29,6 +30,7 @@ const getAdminsFromDB = async (params: any, options:any) => {
       })),
     });
   }
+  // bad practice dekhe rakhbo sudhu
   //
   // [
   //   {
@@ -48,14 +50,16 @@ const getAdminsFromDB = async (params: any, options:any) => {
   const whereConditions: Prisma.AdminWhereInput = { AND: andConditions };
   const result = await prisma.admin.findMany({
     where: whereConditions,
-    skip: (Number(page)-1)*limit,
-    take: Number(limit),
-    orderBy: options.sortBy && options.sortOrder ? {
-      [options.sortBy]: options.sortOrder
-    } : {
-      createdAt: 'asc'
-    }
-
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "asc",
+          },
   });
   return result;
 };
