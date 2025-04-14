@@ -20,6 +20,9 @@ const getAdminsFromDB = async (params: any, options: any) => {
     });
   }
 
+  andConditions.push({
+    isDeleted: false,
+  });
   // specific fields er upor filtering
   if (Object.keys(filteredData).length > 0) {
     andConditions.push({
@@ -76,11 +79,12 @@ const getAdminsFromDB = async (params: any, options: any) => {
 
 // getAdminById
 
-const getAdminById = async (id: string) => {
+const getAdminById = async (id: string): Promise<Admin | null> => {
   // console.log(id)
-  const result = await prisma.admin.findUniqueOrThrow({
+  const result = await prisma.admin.findUnique({
     where: {
       id: id,
+      isDeleted: false,
     },
   });
   return result;
@@ -91,6 +95,7 @@ const updateAdmin = async (id: string, info: Partial<Admin>) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
   const result = await prisma.admin.update({
@@ -103,7 +108,7 @@ const updateAdmin = async (id: string, info: Partial<Admin>) => {
 };
 
 // delete admin
-const deleteAdmin = async (id: string) => {
+const deleteAdmin = async (id: string): Promise<Admin | null> => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
@@ -121,23 +126,25 @@ const deleteAdmin = async (id: string) => {
         email: deleteAdmin.email,
       },
     });
+    return deleteAdmin;
   });
 
   return result;
 };
 
-const softDeleteFromDB = async (id: string) => {
+const softDeleteFromDB = async (id: string): Promise<Admin | null> => {
   const result = await prisma.$transaction(async (tx) => {
     const deleteAdmin = await tx.admin.update({
       where: {
         id,
+        isDeleted: false,
       },
       data: {
         isDeleted: true,
       },
     });
 
-    const deleteUser = await tx.user.update({
+    await tx.user.update({
       where: {
         email: deleteAdmin.email,
       },
@@ -145,8 +152,9 @@ const softDeleteFromDB = async (id: string) => {
         status: UserStatus.DELETED,
       },
     });
+    return deleteAdmin;
   });
-  return result
+  return result;
 };
 
 export const adminService = {
@@ -154,5 +162,5 @@ export const adminService = {
   getAdminById,
   updateAdmin,
   deleteAdmin,
-  softDeleteFromDB
+  softDeleteFromDB,
 };
