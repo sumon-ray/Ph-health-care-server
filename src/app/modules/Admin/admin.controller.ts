@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import pick from "../../../shared/pick";
+import sendResponse from "../../../shared/sendResponse";
 import { adminFilterableField } from "./admin.constant";
 import { adminService } from "./admin.service";
 
@@ -9,7 +10,8 @@ const getAdmin = async (req: Request, res: Response) => {
     const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
     // console.log(options)
     const result = await adminService.getAdminsFromDB(filter, options);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "all admin",
       meta: result.meta,
@@ -31,7 +33,8 @@ const getAdminById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await adminService.getAdminById(id);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "admin fetched successfully",
       data: result,
@@ -54,7 +57,8 @@ const updateAdmin = async (req: Request, res: Response) => {
     // console.log(id)
     // console.log(info)
     const result = await adminService.updateAdmin(id, info);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "admin updated successfully",
       data: result,
@@ -74,7 +78,8 @@ const deleteUser = async (req: Request, res: Response) => {
     // console.log(id)
     // console.log(info)
     const result = await adminService.deleteAdmin(id);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "admin deleted successfully",
       data: result,
@@ -94,7 +99,8 @@ const softDeleteFromDB = async (req: Request, res: Response) => {
     // console.log(id)
     // console.log(info)
     const result = await adminService.softDeleteFromDB(id);
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "admin deleted successfully",
       data: result,
