@@ -1,4 +1,4 @@
-import { Admin, Prisma } from "@prisma/client";
+import { Admin, Prisma, UserStatus } from "@prisma/client";
 import calculatePagination from "../../../helpers/paginationHelper";
 import prisma from "../../../shared/prisma";
 import { adminSearchableField } from "./admin.constant";
@@ -78,7 +78,7 @@ const getAdminsFromDB = async (params: any, options: any) => {
 
 const getAdminById = async (id: string) => {
   // console.log(id)
-  const result = await prisma.admin.findUnique({
+  const result = await prisma.admin.findUniqueOrThrow({
     where: {
       id: id,
     },
@@ -88,6 +88,11 @@ const getAdminById = async (id: string) => {
 
 // update admin data
 const updateAdmin = async (id: string, info: Partial<Admin>) => {
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
   const result = await prisma.admin.update({
     where: {
       id: id,
@@ -99,6 +104,11 @@ const updateAdmin = async (id: string, info: Partial<Admin>) => {
 
 // delete admin
 const deleteAdmin = async (id: string) => {
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
   const result = await prisma.$transaction(async (tx) => {
     const deleteAdmin = await tx.admin.delete({
       where: {
@@ -106,7 +116,7 @@ const deleteAdmin = async (id: string) => {
       },
     });
 
-    const deleteUser = await tx.user.delete({
+    await tx.user.delete({
       where: {
         email: deleteAdmin.email,
       },
@@ -115,9 +125,34 @@ const deleteAdmin = async (id: string) => {
 
   return result;
 };
+
+const softDeleteFromDB = async (id: string) => {
+  const result = await prisma.$transaction(async (tx) => {
+    const deleteAdmin = await tx.admin.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    const deleteUser = await tx.user.update({
+      where: {
+        email: deleteAdmin.email,
+      },
+      data: {
+        status: UserStatus.DELETED,
+      },
+    });
+  });
+  return result
+};
+
 export const adminService = {
   getAdminsFromDB,
   getAdminById,
   updateAdmin,
   deleteAdmin,
+  softDeleteFromDB
 };

@@ -27,10 +27,10 @@ const getAdmin = async (req: Request, res: Response) => {
 // getAdminById
 
 const getAdminById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const result = await adminService.getAdminById(id);
   try {
+    const { id } = req.params;
+    const result = await adminService.getAdminById(id);
+
     res.status(200).json({
       success: true,
       message: "admin fetched successfully",
@@ -48,12 +48,12 @@ const getAdminById = async (req: Request, res: Response) => {
 // update admin
 
 const updateAdmin = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const info = req.body;
-  // console.log(id)
-  // console.log(info)
-  const result = await adminService.updateAdmin(id, info);
   try {
+    const { id } = req.params;
+    const info = req.body;
+    // console.log(id)
+    // console.log(info)
+    const result = await adminService.updateAdmin(id, info);
     res.status(200).json({
       success: true,
       message: "admin updated successfully",
@@ -69,11 +69,31 @@ const updateAdmin = async (req: Request, res: Response) => {
 };
 
 const deleteUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  // console.log(id)
-  // console.log(info)
-  const result = await adminService.deleteAdmin(id);
   try {
+    const { id } = req.params;
+    // console.log(id)
+    // console.log(info)
+    const result = await adminService.deleteAdmin(id);
+    res.status(200).json({
+      success: true,
+      message: "admin deleted successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.name || "failed to delete admin info",
+      error: error,
+    });
+  }
+};
+// soft delete
+const softDeleteFromDB = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    // console.log(id)
+    // console.log(info)
+    const result = await adminService.softDeleteFromDB(id);
     res.status(200).json({
       success: true,
       message: "admin deleted successfully",
@@ -93,4 +113,5 @@ export const adminController = {
   getAdminById,
   updateAdmin,
   deleteUser,
+  softDeleteFromDB,
 };
