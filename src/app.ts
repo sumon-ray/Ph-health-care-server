@@ -1,7 +1,6 @@
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
-import { adminRouter } from "./app/modules/Admin/admin.routes";
-import { userRoutes } from "./app/modules/user.routes";
+import router from "./routes";
 const app: Application = express();
 app.use(cors());
 
@@ -15,6 +14,9 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/admin", adminRouter);
+// bad practice // worst when multiple routes will be added
+// app.use("/api/v1/user", userRoutes);
+// app.use("/api/v1/admin", adminRouter);
+
+app.use("/api/v1",router)
 export default app;
