@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
+import globalErrorHandler from "./app/middleware.ts/globalErrorHandler";
 import router from "./routes";
 const app: Application = express();
 app.use(cors());
@@ -19,14 +20,19 @@ app.get("/", (req: Request, res: Response) => {
 // app.use("/api/v1/admin", adminRouter);
 
 app.use("/api/v1", router);
-export default app;
 
-app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  // console.log("error is here now");
+app.use(globalErrorHandler);
 
-  res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(req);
+  res.status(httpStatus.NOT_FOUND).json({
     success: false,
-    message: error.name || "failed to update admin info",
-    error: error,
+    message: "API NOT FOUND",
+    error: {
+      path: req.originalUrl,
+      message: "your requested path is not found",
+    },
   });
 });
+
+export default app;
