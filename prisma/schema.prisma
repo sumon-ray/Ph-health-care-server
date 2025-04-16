@@ -56,3 +56,13 @@ enum UserStatus {
     BLOCKED
     DELETED  
 }
+
+
+
+
+
+
+// ******************************************************
+// model User2 {
+//   id String @id @default((uuid()))
+// }
