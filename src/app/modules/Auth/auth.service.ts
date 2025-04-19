@@ -1,7 +1,9 @@
 import * as bcrypt from "bcrypt";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import prisma from "../../../shared/prisma";
+import { validateEnv } from "../../../helpers/validateEnv";
 const loginUser = async (data: { email: string; password: string }) => {
+    validateEnv()
   console.log(data);
   const result = await prisma.user.findUniqueOrThrow({
     where: {
@@ -29,16 +31,28 @@ const loginUser = async (data: { email: string; password: string }) => {
   //     };
   //     return jwt.sign(payload, secret, options);
   //   };
+//   if (
+//     !process.env.ACCESS_TOKEN_SECRET ||
+//     !process.env.REFRESH_TOKEN_SECRET ||
+//     !process.env.ACCESS_TOKEN_EXPIRES_IN ||
+//     !process.env.REFRESH_TOKEN_EXPIRES_IN
+//   ) {
+//     throw new Error("JWT credentials are missing in environment variables.");
+//   }
+
   const accessToken = jwtHelpers.createToken(
     { email: result.email, role: result.role },
-    "017239168822@sumon",
-    "5m"
+    process.env.ACCESS_TOKEN_SECRET as string,
+    process.env.ACCESS_TOKEN_EXPIRES_IN as string
   );
   const refreshToken = jwtHelpers.createToken(
     { email: result.email, role: result.role },
-    "01763604565@sumon",
-    "30d"
+    process.env.REFRESH_TOKEN_SECRET as string,
+    process.env.REFRESH_TOKEN_EXPIRES_IN as string
   );
+
+ 
+
   //   const accessToken = jwt.sign(
   //     {
   //       email: result.email,
@@ -74,5 +88,3 @@ const loginUser = async (data: { email: string; password: string }) => {
 export const authService = {
   loginUser,
 };
-
-
