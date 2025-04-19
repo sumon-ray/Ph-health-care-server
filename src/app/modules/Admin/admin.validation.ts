@@ -10,3 +10,6 @@ const update = z.object({
   export const adminValidationSchema = {
     update
   }
+
+
+
