@@ -6,9 +6,6 @@ import { validateEnv } from "../../../helpers/validateEnv";
 import prisma from "../../../shared/prisma";
 const loginUser = async (data: { email: string; password: string }) => {
   validateEnv();
-  //   console.log(data);
-  console.log("Access Secret:", config.jwt.ACCESS_TOKEN_SECRET);
-  console.log("Refresh Secret:", config.jwt.REFRESH_TOKEN_SECRET);
 
   const result = await prisma.user.findUniqueOrThrow({
     where: {
@@ -92,7 +89,6 @@ const loginUser = async (data: { email: string; password: string }) => {
 // refreshToken
 
 const refreshToken = async (token: string) => {
-    
   let decodedData;
   try {
     decodedData = jwtHelpers.verifyToken(
