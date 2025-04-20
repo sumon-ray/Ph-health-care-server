@@ -1,13 +1,19 @@
+import { UserStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import config from "../../../config";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { validateEnv } from "../../../helpers/validateEnv";
 import prisma from "../../../shared/prisma";
 const loginUser = async (data: { email: string; password: string }) => {
   validateEnv();
-  console.log(data);
+  //   console.log(data);
+  console.log("Access Secret:", config.jwt.ACCESS_TOKEN_SECRET);
+  console.log("Refresh Secret:", config.jwt.REFRESH_TOKEN_SECRET);
+
   const result = await prisma.user.findUniqueOrThrow({
     where: {
       email: data.email,
+      status: UserStatus.ACTIVE,
     },
   });
 
@@ -42,13 +48,13 @@ const loginUser = async (data: { email: string; password: string }) => {
 
   const accessToken = jwtHelpers.createToken(
     { email: result.email, role: result.role },
-    process.env.ACCESS_TOKEN_SECRET as string,
-    process.env.ACCESS_TOKEN_EXPIRES_IN as string
+    config.jwt.ACCESS_TOKEN_SECRET as string,
+    config.jwt.ACCESS_TOKEN_EXPIRES_IN as string
   );
   const refreshToken = jwtHelpers.createToken(
     { email: result.email, role: result.role },
-    process.env.REFRESH_TOKEN_SECRET as string,
-    process.env.REFRESH_TOKEN_EXPIRES_IN as string
+    config.jwt.REFRESH_TOKEN_SECRET as string,
+    config.jwt.REFRESH_TOKEN_EXPIRES_IN as string
   );
 
   //   const accessToken = jwt.sign(
@@ -86,10 +92,13 @@ const loginUser = async (data: { email: string; password: string }) => {
 // refreshToken
 
 const refreshToken = async (token: string) => {
-
+    
   let decodedData;
   try {
-    decodedData = jwtHelpers.verifyToken(token,`${process.env.REFRESH_TOKEN_SECRET}`);
+    decodedData = jwtHelpers.verifyToken(
+      token,
+      `${config.jwt.REFRESH_TOKEN_SECRET}`
+    );
     // console.log(decodedData);
   } catch (error) {
     throw new Error("You are not authorized");
@@ -98,13 +107,14 @@ const refreshToken = async (token: string) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: decodedData.email,
+      status: UserStatus.ACTIVE,
     },
   });
 
   const accessToken = jwtHelpers.createToken(
     { email: userData.email, role: userData.role },
-    process.env.ACCESS_TOKEN_SECRET as string,
-    process.env.ACCESS_TOKEN_EXPIRES_IN as string
+    config.jwt.ACCESS_TOKEN_SECRET as string,
+    config.jwt.ACCESS_TOKEN_EXPIRES_IN as string
   );
 
   return {
@@ -117,4 +127,3 @@ export const authService = {
   loginUser,
   refreshToken,
 };
-
