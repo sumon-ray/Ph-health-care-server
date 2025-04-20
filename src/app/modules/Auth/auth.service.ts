@@ -1,9 +1,9 @@
 import * as bcrypt from "bcrypt";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
-import prisma from "../../../shared/prisma";
 import { validateEnv } from "../../../helpers/validateEnv";
+import prisma from "../../../shared/prisma";
 const loginUser = async (data: { email: string; password: string }) => {
-    validateEnv()
+  validateEnv();
   console.log(data);
   const result = await prisma.user.findUniqueOrThrow({
     where: {
@@ -31,14 +31,14 @@ const loginUser = async (data: { email: string; password: string }) => {
   //     };
   //     return jwt.sign(payload, secret, options);
   //   };
-//   if (
-//     !process.env.ACCESS_TOKEN_SECRET ||
-//     !process.env.REFRESH_TOKEN_SECRET ||
-//     !process.env.ACCESS_TOKEN_EXPIRES_IN ||
-//     !process.env.REFRESH_TOKEN_EXPIRES_IN
-//   ) {
-//     throw new Error("JWT credentials are missing in environment variables.");
-//   }
+  //   if (
+  //     !process.env.ACCESS_TOKEN_SECRET ||
+  //     !process.env.REFRESH_TOKEN_SECRET ||
+  //     !process.env.ACCESS_TOKEN_EXPIRES_IN ||
+  //     !process.env.REFRESH_TOKEN_EXPIRES_IN
+  //   ) {
+  //     throw new Error("JWT credentials are missing in environment variables.");
+  //   }
 
   const accessToken = jwtHelpers.createToken(
     { email: result.email, role: result.role },
@@ -50,8 +50,6 @@ const loginUser = async (data: { email: string; password: string }) => {
     process.env.REFRESH_TOKEN_SECRET as string,
     process.env.REFRESH_TOKEN_EXPIRES_IN as string
   );
-
- 
 
   //   const accessToken = jwt.sign(
   //     {
@@ -85,6 +83,38 @@ const loginUser = async (data: { email: string; password: string }) => {
   };
 };
 
+// refreshToken
+
+const refreshToken = async (token: string) => {
+
+  let decodedData;
+  try {
+    decodedData = jwtHelpers.verifyToken(token,`${process.env.REFRESH_TOKEN_SECRET}`);
+    // console.log(decodedData);
+  } catch (error) {
+    throw new Error("You are not authorized");
+  }
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: decodedData.email,
+    },
+  });
+
+  const accessToken = jwtHelpers.createToken(
+    { email: userData.email, role: userData.role },
+    process.env.ACCESS_TOKEN_SECRET as string,
+    process.env.ACCESS_TOKEN_EXPIRES_IN as string
+  );
+
+  return {
+    accessToken,
+    needPasswordChange: userData.needPasswordChange,
+  };
+};
+
 export const authService = {
   loginUser,
+  refreshToken,
 };
+

@@ -1,5 +1,6 @@
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
+import cookieParser from 'cookie-parser'
 import globalErrorHandler from "./app/middleware.ts/globalErrorHandler";
 import notFoundRoute from "./error/notFoundRoute";
 import router from "./routes";
@@ -8,6 +9,7 @@ app.use(cors());
 // parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 // *********************************************
 // app.get("/", (req: Request, res: Response) => {
 //   res.send({
