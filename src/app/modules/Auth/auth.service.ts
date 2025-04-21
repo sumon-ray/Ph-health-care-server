@@ -1,5 +1,6 @@
 import { UserStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { Secret } from "jsonwebtoken";
 import config from "../../../config";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { validateEnv } from "../../../helpers/validateEnv";
@@ -151,8 +152,31 @@ const passwordChange = async (user: any, payload: any) => {
     message: "Password changed successfully",
   };
 };
+
+// forgot password
+const forgotPassword = async (payload: { email: string }) => {
+  // console.log(payload)
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: payload.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  //   console.log(result);
+  // token generate
+  const resetPassToken = jwtHelpers.createToken(
+    { email: userData.email, role: userData.role },
+    config.RESET_PASSWORD_TOKEN as Secret,
+    config.RESET_PASSWORD_TOKEN_EXP_IN as string
+  );
+//   console.log(resetPassToken);
+
+
+};
 export const authService = {
   loginUser,
   refreshToken,
   passwordChange,
+  forgotPassword,
 };
