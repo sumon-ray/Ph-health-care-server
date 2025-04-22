@@ -50,13 +50,28 @@ const passwordChange = catchAsync(
 );
 
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-  const result = await authService.forgotPassword(req.body);
+  await authService.forgotPassword(req.body);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "forgot password",
-    data: result,
+    message: "check your email",
+    data: null,
+  });
+});
+
+// reset-password
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+//   const token = req.headers.authorization || "";
+const token = req.headers.authorization?.replace("Bearer ", "") || "";
+
+  await authService.resetPassword(token, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "password reset ",
+    data: null,
   });
 });
 export const authControlller = {
@@ -64,4 +79,5 @@ export const authControlller = {
   refreshToken,
   passwordChange,
   forgotPassword,
+  resetPassword,
 };
