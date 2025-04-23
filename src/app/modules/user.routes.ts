@@ -1,16 +1,20 @@
 import { UserRole } from "@prisma/client";
-import express from "express";
+import express, { NextFunction } from "express";
 import { fileUploads } from "../../helpers/fileUploader";
 import auth from "../middleware.ts/auth";
 import { userController } from "./user.controller";
+import { userValidation } from "./user.validation";
 
 const router = express.Router();
 
 router.post(
   "/",
-  fileUploads.upload.single("file"),
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  userController.createAdmin
+  fileUploads.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = userValidation.createAdmin.parse(JSON.parse(req.body.data) );
+    return userController.createAdmin(req, res, next);
+  }
 );
 
 export const userRoutes = router;

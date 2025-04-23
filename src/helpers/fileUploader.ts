@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 import multer from "multer";
 import path from "path";
 
@@ -32,6 +33,7 @@ const uploadToCloudinary = async (file: any) => {
           public_id: file.originalname,
         },
         (error, result)=>{
+            fs.unlinkSync(file.path)
             if (error) {
                 reject(error)
             }
@@ -39,6 +41,7 @@ const uploadToCloudinary = async (file: any) => {
                 resolve(result)
             }
         }
+
       )
     //   .catch((error) => {
     //     console.log(error);
