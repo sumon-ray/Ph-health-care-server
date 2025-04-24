@@ -9,6 +9,39 @@ const createAdmin = z.object({
   }),
 });
 
+// doctor
+
+// Enum validation
+const genderEnum = z.enum(["MALE", "FEMALE"]);
+
+export const createDoctor = z.object({
+  password: z.string({ required_error: "password is required" }),
+
+  doctor: z.object({
+    name: z.string({ required_error: "Name is required" }),
+    email: z
+      .string({ required_error: "Email is required" })
+      .email("Invalid email format"),
+    profilePhoto: z.string().url("Must be a valid URL").optional(),
+    contactNumber: z.string({ required_error: "Contact number is required" }),
+    address: z.string().optional(),
+    registrationNumber: z.string({
+      required_error: "Registration number is required",
+    }),
+    experience: z.number().optional(),
+    gender: genderEnum,
+    appointmentFee: z.number({
+      required_error: "Appointment fee must be a non-negative number",
+    }),
+    qualification: z.string({ required_error: "Qualification is required" }),
+    currentWorkingPlace: z.string({
+      required_error: "Current working place is required",
+    }),
+    designation: z.string({ required_error: "Designation is required" }),
+  }),
+});
+
 export const userValidation = {
   createAdmin,
+  createDoctor,
 };

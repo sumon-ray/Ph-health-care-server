@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { fileUploads } from "../../helpers/fileUploader";
 import prisma from "../../shared/prisma";
 import { IFile } from "../interfaces/file";
+
 const createAdmin = async (req: any) => {
   console.log(req.body);
 
@@ -48,6 +49,42 @@ const createAdmin = async (req: any) => {
   return result;
 };
 
+// create doctor
+
+const createDoctor = async (req: any) => {
+  console.log(req.body);
+
+  if (req.file) {
+    const file: IFile = req.file;
+    const uploadToCloudinary = await fileUploads.uploadToCloudinary(file);
+    // console.log("uploaded=>", uploadToCloudinary);
+    req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url;
+
+    //  console.log(req.body)
+  }
+
+  const hashPassword = await bcrypt.hash(req.body.password, 12);
+  const userData = {
+    email: req.body.doctor.email,
+    password: hashPassword,
+    role: UserRole.DOCTOR,
+  };
+
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.user.create({
+      data: userData,
+    });
+
+    const createDoctorData = await tx.admin.create({
+      data: req.body.doctor,
+    });
+    return createDoctorData;
+  });
+
+  return result;
+};
+
 export const userService = {
   createAdmin,
+  createDoctor,
 };
