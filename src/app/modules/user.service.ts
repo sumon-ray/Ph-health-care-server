@@ -4,6 +4,9 @@ import { Request } from "express";
 import { fileUploads } from "../../helpers/fileUploader";
 import prisma from "../../shared/prisma";
 import { IFile } from "../interfaces/file";
+import { IPaginationOptions } from "../interfaces/pagination";
+import calculatePagination from "../../helpers/paginationHelper";
+import { userSearchableField } from "./user.constant";
 
 const createAdmin = async (req: Request): Promise<Admin> => {
   // console.log(req.body);
@@ -87,7 +90,88 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
   return result;
 };
 
+//
+
+const getAllFromDB = async (
+  params: any,
+  options: IPaginationOptions
+) => {
+  // console.log(options);
+  const { page, limit, skip } = calculatePagination(options);
+  const { searchTerm, ...filteredData } = await params;
+  // console.log({ filteredData });
+  const andConditions: Prisma.UserWhereInput[] = [];
+  if (params.searchTerm) {
+    andConditions.push({
+      OR: userSearchableField.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  // andConditions.push({
+  //   isDeleted: false,
+  // });
+  // specific fields er upor filtering
+  if (Object.keys(filteredData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filteredData).map((key) => ({
+        [key.trim()]: {
+          equals: (filteredData as any)[key],
+        },
+      })),
+    });
+  }
+  // bad practice dekhe rakhbo sudhu
+  //
+  // [
+  //   {
+  //     name: {
+  //       contains: params.searchTerm,
+  //       mode: "insensitive",
+  //     },
+  //   },
+  //   {
+  //     email: {
+  //       contains: params.searchTerm,
+  //       mode: "insensitive",
+  //     },
+  //   },
+  // ],
+
+  const whereConditions: Prisma.UserWhereInput = { AND: andConditions };
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "asc",
+          },
+  });
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+
 export const userService = {
   createAdmin,
   createDoctor,
+  getAllFromDB
 };
