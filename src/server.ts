@@ -1,7 +1,10 @@
 import { Server } from "http";
-import app from "./app";
+import app from './app';
 import config from "./config";
 const port = config.port;
+
+
+// main
 async function main() {
   const server: Server = app.listen(port, () => {
     console.log("app is listening on port", port);
@@ -9,6 +12,8 @@ async function main() {
 }
 
 main();
+
+
 
 // সংক্ষেপে বললে:
 // 👉 main() async function এর মাধ্যমে তুমি:

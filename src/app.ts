@@ -23,6 +23,7 @@ app.use(cookieParser())
 //   })
 // })
 
+
 const rootController = (req: Request, res: Response) => {
   res.send({
     message: "hellow express js",
