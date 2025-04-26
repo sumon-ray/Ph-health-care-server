@@ -1,11 +1,11 @@
-import { Admin, Doctor, Prisma, UserRole } from "@prisma/client";
+import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request } from "express";
 import { fileUploads } from "../../helpers/fileUploader";
+import calculatePagination from "../../helpers/paginationHelper";
 import prisma from "../../shared/prisma";
 import { IFile } from "../interfaces/file";
 import { IPaginationOptions } from "../interfaces/pagination";
-import calculatePagination from "../../helpers/paginationHelper";
 import { userSearchableField } from "./user.constant";
 
 const createAdmin = async (req: Request): Promise<Admin> => {
@@ -92,10 +92,7 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
 
 //
 
-const getAllFromDB = async (
-  params: any,
-  options: IPaginationOptions
-) => {
+const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   // console.log(options);
   const { page, limit, skip } = calculatePagination(options);
   const { searchTerm, ...filteredData } = await params;
@@ -155,6 +152,15 @@ const getAllFromDB = async (
         : {
             createdAt: "asc",
           },
+    select: {
+      id: true,
+      email: true,
+      needPasswordChange: true,
+      status: true,
+      role: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
   const total = await prisma.user.count({
     where: whereConditions,
@@ -169,9 +175,29 @@ const getAllFromDB = async (
   };
 };
 
+const changeProfileStatus = async (
+  id: string,
+  status: UserRole
+) => {
+  // console.log(id, data)
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: id,
+    },
+  });
+  const updateUserStatus = await prisma.user.update({
+    where: {
+      id,
+    },
+    data:status,
+  });
+
+  return updateUserStatus;
+};
 
 export const userService = {
   createAdmin,
   createDoctor,
-  getAllFromDB
+  getAllFromDB,
+  changeProfileStatus,
 };
