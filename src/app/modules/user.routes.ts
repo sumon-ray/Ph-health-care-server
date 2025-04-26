@@ -8,8 +8,17 @@ import { userValidation } from "./user.validation";
 const router = express.Router();
 
 router.get("/", userController.getAllFromDB);
+router.get(
+  "/me",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  userController.getMyProfile
+);
 
-router.patch("/:id/status", userController.changeProfileStatus);
+router.patch(
+  "/:id/status",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  userController.changeProfileStatus
+);
 
 router.post(
   "/create-admin",
