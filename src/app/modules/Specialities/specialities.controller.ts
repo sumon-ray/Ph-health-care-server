@@ -44,9 +44,23 @@ const getSpecialitiesById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+// getSpecialitiesById
+const deleteSpecialitiesFromDB = catchAsync(async (req: Request, res: Response) => {
+  // console.log(req.body)
+  const { id } = req.params;
+  const result = await specialitiesService.deleteSpecialitiesFromDB(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "delete specialties successfully",
+    data: result,
+  });
+});
 
 export const specialitiesController = {
   insertIntoDB,
   getSpecialitiesFromDB,
   getSpecialitiesById,
+  deleteSpecialitiesFromDB
 };

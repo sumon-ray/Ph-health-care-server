@@ -15,6 +15,7 @@ router.post(
 
 router.get('/', specialitiesController.getSpecialitiesFromDB)
 router.get('/:id', specialitiesController.getSpecialitiesById)
+router.delete('/:id', specialitiesController.deleteSpecialitiesFromDB)
 
 export const specialitiesRouter = router;
 
