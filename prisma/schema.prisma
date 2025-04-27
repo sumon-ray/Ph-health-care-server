@@ -61,9 +61,26 @@ model Doctor {
   isDeleted Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  doctorSpecialities DoctorSpecialities[]
   user User @relation(fields: [email], references: [email])
   @@map("doctors")
+}
+model Specialities{
+  id String @id @default(uuid())
+  title String
+  icon String
+  specialities  DoctorSpecialities[]
+  @@map("specialities")
+}
+
+model DoctorSpecialities {
+  specialitiesId String
+  specialities Specialities @relation(fields: [specialitiesId], references: [id])
+  doctorId String
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+
+  @@id([specialitiesId, doctorId])
+  @@map("doctor_specialities")
 }
 enum Gender {
   MALE

@@ -7,6 +7,7 @@ import prisma from "../../shared/prisma";
 import { IFile } from "../interfaces/file";
 import { IPaginationOptions } from "../interfaces/pagination";
 import { userSearchableField } from "./user.constant";
+import { TAuth } from "../interfaces/common";
 
 const createAdmin = async (req: Request): Promise<Admin> => {
   // console.log(req.body);
@@ -193,10 +194,10 @@ const changeProfileStatus = async (id: string, status: UserRole) => {
 };
 
 // get my profile
-const getMyProfile = async (user: any) => {
+const getMyProfile = async (user: TAuth) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
       status: UserStatus.ACTIVE,
     },
     select: {
@@ -231,8 +232,8 @@ const getMyProfile = async (user: any) => {
   return { ...userInfo, ...profileInfo };
 };
 
-const updateMyProfile = async (user: any, req: Request) => {
-  // console.log(user,data)
+const updateMyProfile = async (user: TAuth, req: Request) => {
+  console.log(user)
   const file = req.file as IFile;
   // profile photo upload
   if (file) {
@@ -241,7 +242,7 @@ const updateMyProfile = async (user: any, req: Request) => {
   }
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
       status: UserStatus.ACTIVE,
     },
   });
