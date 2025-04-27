@@ -13,6 +13,9 @@ router.post(
   }
 );
 
+router.get('/', specialitiesController.getSpecialitiesFromDB)
+router.get('/:id', specialitiesController.getSpecialitiesById)
+
 export const specialitiesRouter = router;
 
 // router.post(
