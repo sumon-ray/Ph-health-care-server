@@ -1,13 +1,13 @@
 import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request } from "express";
-import { fileUploads } from "../../helpers/fileUploader";
-import calculatePagination from "../../helpers/paginationHelper";
-import prisma from "../../shared/prisma";
-import { IFile } from "../interfaces/file";
-import { IPaginationOptions } from "../interfaces/pagination";
+import { fileUploads } from "../../../helpers/fileUploader";
+import calculatePagination from "../../../helpers/paginationHelper";
+import prisma from "../../../shared/prisma";
+import { TAuth } from "../../interfaces/common";
+import { IFile } from "../../interfaces/file";
+import { IPaginationOptions } from "../../interfaces/pagination";
 import { userSearchableField } from "./user.constant";
-import { TAuth } from "../interfaces/common";
 
 const createAdmin = async (req: Request): Promise<Admin> => {
   // console.log(req.body);
@@ -233,7 +233,7 @@ const getMyProfile = async (user: TAuth) => {
 };
 
 const updateMyProfile = async (user: TAuth, req: Request) => {
-  console.log(user)
+  console.log(user);
   const file = req.file as IFile;
   // profile photo upload
   if (file) {
