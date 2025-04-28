@@ -40,6 +40,25 @@ const createDoctor = async (req: Request, res: Response) => {
     });
   }
 };
+const createPatient = async (req: Request, res: Response) => {
+  console.log("req", req.body);  // Debugging request body
+  try {
+    const result = await userService.createPatient(req); // Assume this handles creating the patient
+    res.status(200).json({
+      success: true,
+      message: "Patient created successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    // Log error for debugging
+    console.error("Error occurred while creating patient:", error);
+    res.status(500).json({
+      success: false,
+      message: error.name || "invalid",
+      error: error,
+    });
+  }
+};
 
 //
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
@@ -103,6 +122,7 @@ const updateMyProfile = catchAsync(
 export const userController = {
   createAdmin,
   createDoctor,
+  createPatient,
   getAllFromDB,
   changeProfileStatus,
   getMyProfile,
