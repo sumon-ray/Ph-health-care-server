@@ -14,74 +14,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
-  id String @id @default(uuid()) // id string hole 
-  email String @unique
-  password  String
-  role UserRole
-  needPasswordChange Boolean @default(true)
-  status UserStatus @default(ACTIVE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  admin Admin?
-  doctor Doctor?
+  id                 String     @id @default(uuid()) // id string hole 
+  email              String     @unique
+  password           String
+  role               UserRole
+  needPasswordChange Boolean    @default(true)
+  status             UserStatus @default(ACTIVE)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  admin              Admin?
+  doctor             Doctor?
+  Patient            Patient?
+
   @@map("users")
 }
 
 model Admin {
-  id String @id @default(uuid())
-  name String 
-  email String @unique
-  user User @relation(fields: [email], references: [email])
-  profilePhoto String?
-  contactNumber String 
-  isDeleted Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  user          User     @relation(fields: [email], references: [email])
+  profilePhoto  String?
+  contactNumber String
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("admins")
 }
 
 model Doctor {
-  id String @id @default(uuid())
-  name String 
-  email String @unique
-  profilePhoto String?
-  contactNumber String 
-  address String?
-  registrationNumber String
-  experience Int @default(0)
-  gender Gender
-  appointmentFee Int
-  qualification String
+  id                  String               @id @default(uuid())
+  name                String
+  email               String               @unique
+  profilePhoto        String?
+  contactNumber       String
+  address             String?
+  registrationNumber  String
+  experience          Int                  @default(0)
+  gender              Gender
+  appointmentFee      Int
+  qualification       String
   currentWorkingPlace String
-  designation String
-  isDeleted Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  doctorSpecialities DoctorSpecialities[]
-  user User @relation(fields: [email], references: [email])
+  designation         String
+  isDeleted           Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  doctorSpecialities  DoctorSpecialities[]
+  user                User                 @relation(fields: [email], references: [email])
+
   @@map("doctors")
 }
-model Specialities{
-  id String @id @default(uuid())
-  title String
-  icon String
-  specialities  DoctorSpecialities[]
+
+model Specialities {
+  id           String               @id @default(uuid())
+  title        String
+  icon         String
+  specialities DoctorSpecialities[]
+
   @@map("specialities")
 }
 
 model DoctorSpecialities {
   specialitiesId String
-  specialities Specialities @relation(fields: [specialitiesId], references: [id])
-  doctorId String
-  doctor Doctor @relation(fields: [doctorId], references: [id])
+  specialities   Specialities @relation(fields: [specialitiesId], references: [id])
+  doctorId       String
+  doctor         Doctor       @relation(fields: [doctorId], references: [id])
 
   @@id([specialitiesId, doctorId])
   @@map("doctor_specialities")
 }
+
+// Patient
+model Patient {
+  id            String   @id @default(uuid())
+  name          String
+  email         String @unique
+  user       User     @relation(fields: [email], references: [email])
+  profilePhoto  String
+  contactNumber String
+  address       String
+  isDeleted     Boolean
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("patients")
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -95,15 +115,10 @@ enum UserRole {
 }
 
 enum UserStatus {
-    ACTIVE
-    BLOCKED
-    DELETED  
+  ACTIVE
+  BLOCKED
+  DELETED
 }
-
-
-
-
-
 
 // ******************************************************
 // model User2 {

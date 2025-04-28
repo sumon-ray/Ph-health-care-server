@@ -19,3 +19,4 @@ export default {
     app_password: process.env.APP_PASSWORD,
   },
 };
+

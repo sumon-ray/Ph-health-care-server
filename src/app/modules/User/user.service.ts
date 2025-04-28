@@ -54,6 +54,21 @@ const createAdmin = async (req: Request): Promise<Admin> => {
   return result;
 };
 
+// create patient
+const createPatient = async(req:Request): Promise<Pati>=>{
+  const hashPassword = await bcrypt.hash(req.body.password, 12)
+
+  const userData = {
+    email:req.body.doctor.email,
+    password: hashPassword,
+    role: UserRole.PATIENT
+  }
+  const result = await prisma.$transaction(async(tx)=>{
+    await tx.user.create({
+      data: userData,
+    })
+  })
+}
 // create doctor
 
 const createDoctor = async (req: Request): Promise<Doctor> => {

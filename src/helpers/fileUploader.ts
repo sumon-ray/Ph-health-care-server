@@ -22,8 +22,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+
+//
 const uploadToCloudinary = async (file: IFile):Promise<ICLoudinaryResponse> => {
-  console.log(file );
+  // console.log(file );
   // Upload an image
 
   return new Promise((resolve, reject) => {
