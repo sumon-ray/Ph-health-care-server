@@ -46,7 +46,9 @@ router.post(
   (req: Request, res: Response) => {
     try {
       if (req.body.data) {
-        req.body = JSON.parse(req.body.data);
+        req.body = userValidation.createPatient.parse(
+          JSON.parse(req.body.data)
+        );
       }
       return userController.createPatient(req, res);
     } catch (error) {
