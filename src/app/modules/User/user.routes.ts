@@ -43,21 +43,10 @@ router.post(
   "/create-patient",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.PATIENT),
   fileUploads.upload.single("file"),
-  (req: Request, res: Response) => {
-    try {
-      if (req.body.data) {
-        req.body = userValidation.createPatient.parse(
-          JSON.parse(req.body.data)
-        );
-      }
-      return userController.createPatient(req, res);
-    } catch (error) {
-      console.error("Error parsing body", error);
-      res.status(400).json({
-        success: false,
-        message: "Invalid body format",
-      });
-    }
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = userValidation.createPatient.parse(JSON.parse(req.body.data));
+
+    return userController.createPatient(req, res);
   }
 );
 
