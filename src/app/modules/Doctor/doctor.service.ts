@@ -8,18 +8,36 @@ const getAllDoctorFromDB = async () => {
 };
 // update admin data
 const updateDoctor = async (id: string, data: any): Promise<Doctor | null> => {
-  await prisma.doctor.findUniqueOrThrow({
+  const { specialities, ...doctorData } = data;
+  console.log(specialities, doctorData);
+  const doctorInfo = await prisma.doctor.findUniqueOrThrow({
     where: {
       id,
     },
   });
-  const result = await prisma.doctor.update({
-    where: {
-      id,
-    },
-    data: data
+
+  const result = await prisma.$transaction(async (tx) => {
+    const updateDoctor = await tx.doctor.update({
+      where: {
+        id,
+      },
+      data: doctorData,
+      include: {
+        doctorSpecialities: true,
+      },
+    });
+
+    for (const specialitiesId of specialities) {
+      const createSpecialities = await tx.doctorSpecialities.create({
+        data: {
+          doctorId: doctorInfo.id,
+          specialitiesId: specialitiesId,
+        },
+      });
+    }
+    return updateDoctor
   });
-  return result;
+  return result
 };
 
 export const doctorService = {

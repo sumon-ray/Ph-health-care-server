@@ -15,7 +15,6 @@ const getAllDoctorFromDB = catchAsync(async (req: Request, res: Response) => {
 
 const updateDoctor = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  console.log(id, req.body);
   const result = await doctorService.updateDoctor(id, req.body);
   sendResponse(res, {
     statusCode: 200,

@@ -9,7 +9,7 @@ const getAdminsFromDB = async (
   params: IAdminFilterRequest,
   options: IPaginationOptions
 ) => {
-  console.log(options);
+  // console.log(options);
   const { page, limit, skip } = calculatePagination(options);
   const { searchTerm, ...filteredData } = await params;
   // console.log({ filteredData });
