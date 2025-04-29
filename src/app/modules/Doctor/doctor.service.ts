@@ -16,7 +16,7 @@ const updateDoctor = async (id: string, data: any): Promise<Doctor | null> => {
     },
   });
 
-  const result = await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     const updateDoctor = await tx.doctor.update({
       where: {
         id,
@@ -27,17 +27,49 @@ const updateDoctor = async (id: string, data: any): Promise<Doctor | null> => {
       },
     });
 
-    for (const specialitiesId of specialities) {
-      const createSpecialities = await tx.doctorSpecialities.create({
-        data: {
-          doctorId: doctorInfo.id,
-          specialitiesId: specialitiesId,
-        },
-      });
+    if (specialities && specialities.length) {
+      // delete
+      const deleteSpecialitiesIds = specialities.filter(
+        (speciality) => speciality.isDeleted
+      );
+
+      for (const speciality of deleteSpecialitiesIds) {
+        await tx.doctorSpecialities.deleteMany({
+          where: {
+            doctorId: doctorInfo.id,
+            specialitiesId: speciality.specialitiesId,
+          },
+        });
+      }
+
+      // create
+      const createSpecialitiesIds = specialities.filter(
+        (speciality) => !speciality.isDeleted
+      );
+      for (const speciality of createSpecialitiesIds) {
+        await tx.doctorSpecialities.create({
+          data: {
+            doctorId: doctorInfo.id,
+            specialitiesId: speciality.specialitiesId,
+          },
+        });
+      }
     }
-    return updateDoctor
   });
-  return result
+
+  const result = await prisma.doctor.findUnique({
+    where: {
+      id: doctorInfo.id,
+    },
+    include: {
+      doctorSpecialities: {
+        include: {
+          specialities: true
+        }
+      }
+    },
+  });
+  return result;
 };
 
 export const doctorService = {
