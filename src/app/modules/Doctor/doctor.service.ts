@@ -30,7 +30,7 @@ const updateDoctor = async (id: string, data: any): Promise<Doctor | null> => {
     if (specialities && specialities.length) {
       // delete
       const deleteSpecialitiesIds = specialities.filter(
-        (speciality) => speciality.isDeleted
+        (speciality:any) => speciality.isDeleted
       );
 
       for (const speciality of deleteSpecialitiesIds) {
@@ -44,7 +44,7 @@ const updateDoctor = async (id: string, data: any): Promise<Doctor | null> => {
 
       // create
       const createSpecialitiesIds = specialities.filter(
-        (speciality) => !speciality.isDeleted
+        (speciality:any) => !speciality.isDeleted
       );
       for (const speciality of createSpecialitiesIds) {
         await tx.doctorSpecialities.create({
