@@ -131,7 +131,6 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
 };
 
 //
-
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   // console.log(options);
   const { page, limit, skip } = calculatePagination(options);
